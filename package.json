@@ -12,7 +12,8 @@
     "db:seed": "npm --prefix server run db:seed",
     "db:reset": "npm --prefix server run db:reset",
     "build": "npm --prefix client run build",
-    "start": "npm --prefix server start"
+    "start": "npm --prefix server start",
+    "start:produksi": "npm --prefix server run start:produksi"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

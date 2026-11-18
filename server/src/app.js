@@ -14,6 +14,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export function buatApp() {
   const app = express();
 
+  // Di belakang proxy hosting (Render/Railway dsb.) supaya cookie secure & IP asli benar
+  app.set('trust proxy', 1);
+
   app.use(
     cors({
       origin: config.clientOrigin,

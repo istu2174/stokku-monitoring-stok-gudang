@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-krem text-ink antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  /* Fokus keyboard tetap kelihatan jelas */
+  :focus-visible {
+    @apply outline-none ring-2 ring-laut/40 ring-offset-2;
+  }
+}
+
+@layer components {
+  /* Kartu dasar untuk semua panel */
+  .kartu {
+    @apply rounded-2xl bg-white shadow-kartu ring-1 ring-slate-100;
+  }
+
+  /* Tombol utama & sekunder */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition
+      disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-utama {
+    @apply btn bg-laut text-white hover:bg-teal-800 active:scale-[0.98];
+  }
+  .btn-sekunder {
+    @apply btn bg-white text-ink ring-1 ring-slate-200 hover:bg-slate-50;
+  }
+  .btn-bahaya {
+    @apply btn bg-habis text-white hover:bg-red-700;
+  }
+  .btn-kecil {
+    @apply px-3 py-1.5 text-xs;
+  }
+
+  /* Input form dibuat besar supaya nyaman di tablet/HP */
+  .input {
+    @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-ink
+      placeholder:text-slate-400 focus:border-laut focus:outline-none focus:ring-2 focus:ring-laut/20;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-slate-700;
+  }
+
+  /* Tabel dengan baris zebra tipis */
+  .tabel {
+    @apply w-full border-collapse text-sm;
+  }
+  .tabel th {
+    @apply whitespace-nowrap border-b border-slate-200 bg-slate-50/80 px-3 py-2.5 text-left text-xs
+      font-semibold uppercase tracking-wide text-inkl;
+  }
+  .tabel td {
+    @apply border-b border-slate-100 px-3 py-3 align-middle;
+  }
+  .tabel tbody tr:nth-child(even) {
+    @apply bg-slate-50/60;
+  }
+  .tabel tbody tr:hover {
+    @apply bg-lauts/60;
+  }
+}

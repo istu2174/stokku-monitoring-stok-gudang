@@ -1,0 +1,168 @@
+// Skema database StokKu
+// SQLite dipakai supaya gampang dijalankan lokal; enum disimpan sebagai String
+// karena konektor SQLite tidak mendukung enum Prisma.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────
+// USER & ROLE
+// role: ADMIN_SISTEM | MANAJER | KEPALA | ADMIN_INVENTORI | STAF | AUDITOR
+// ─────────────────────────────────────────────────────────────
+model User {
+  id           String   @id @default(cuid())
+  nama         String
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  role         String
+  aktif        Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  transaksiDibuat     TransaksiStok[] @relation("TransaksiDibuat")
+  transaksiDisetujui  TransaksiStok[] @relation("TransaksiDisetujui")
+  auditLogs           AuditLog[]
+
+  @@index([role])
+}
+
+// ─────────────────────────────────────────────────────────────
+// MASTER DATA
+// ─────────────────────────────────────────────────────────────
+model Kategori {
+  id        String   @id @default(cuid())
+  nama      String   @unique
+  ikon      String   @default("📦")
+  warna     String   @default("#0EA5A4")
+  createdAt DateTime @default(now())
+
+  barang Barang[]
+}
+
+model Barang {
+  id        String   @id @default(cuid())
+  sku       String   @unique
+  nama      String
+  kategoriId String
+  satuan    String // kg, pcs, dus, liter, box, dll
+  stokMin   Float    @default(0)
+  lokasiRak String   @default("")
+  hargaBeli Int      @default(0) // rupiah, tanpa desimal
+  foto      String?
+  aktif     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  kategori Kategori      @relation(fields: [kategoriId], references: [id])
+  batches  BatchStok[]
+  items    ItemTransaksi[]
+
+  @@index([kategoriId])
+  @@index([nama])
+}
+
+// Stok disimpan per batch supaya bisa FEFO (expired terdekat keluar dulu)
+model BatchStok {
+  id        String    @id @default(cuid())
+  barangId  String
+  batchNo   String    @default("-")
+  qty       Float     @default(0)
+  expiredAt DateTime?
+  createdAt DateTime  @default(now())
+
+  barang Barang          @relation(fields: [barangId], references: [id], onDelete: Cascade)
+  items  ItemTransaksi[]
+
+  @@unique([barangId, batchNo])
+  @@index([barangId])
+  @@index([expiredAt])
+}
+
+model Supplier {
+  id        String   @id @default(cuid())
+  nama      String
+  kontak    String   @default("")
+  alamat    String   @default("")
+  catatan   String   @default("")
+  aktif     Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  transaksi TransaksiStok[]
+
+  @@index([nama])
+}
+
+// ─────────────────────────────────────────────────────────────
+// TRANSAKSI STOK
+// tipe:   MASUK | KELUAR | PENYESUAIAN
+// status: MENUNGGU | DISETUJUI | DITOLAK
+// ─────────────────────────────────────────────────────────────
+model TransaksiStok {
+  id              String    @id @default(cuid())
+  tipe            String
+  status          String    @default("MENUNGGU")
+  tanggal         DateTime
+  supplierId      String?
+  noDokumen       String?
+  tujuan          String?
+  alasan          String?
+  dibuatOlehId    String
+  disetujuiOlehId String?
+  approvedAt      DateTime?
+  catatanTolak    String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  supplier    Supplier? @relation(fields: [supplierId], references: [id])
+  dibuatOleh  User      @relation("TransaksiDibuat", fields: [dibuatOlehId], references: [id])
+  disetujuiOleh User?   @relation("TransaksiDisetujui", fields: [disetujuiOlehId], references: [id])
+  items       ItemTransaksi[]
+
+  @@index([tipe, status])
+  @@index([tanggal])
+  @@index([dibuatOlehId])
+}
+
+model ItemTransaksi {
+  id          String  @id @default(cuid())
+  transaksiId String
+  barangId    String
+  batchId     String?
+  qty         Float // untuk PENYESUAIAN berisi selisih (bisa negatif)
+  harga       Int? // harga beli saat transaksi masuk
+  stokSistem  Float? // khusus opname: stok menurut sistem
+  stokFisik   Float? // khusus opname: hasil hitung fisik
+
+  transaksi TransaksiStok @relation(fields: [transaksiId], references: [id], onDelete: Cascade)
+  barang    Barang        @relation(fields: [barangId], references: [id])
+  batch     BatchStok?    @relation(fields: [batchId], references: [id])
+
+  @@index([transaksiId])
+  @@index([barangId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// AUDIT LOG (hanya tambah, tidak bisa diedit/dihapus)
+// ─────────────────────────────────────────────────────────────
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  aksi      String // LOGIN, CREATE, UPDATE, DELETE, APPROVE, REJECT, ...
+  entitas   String // User, Barang, TransaksiStok, ...
+  entitasId String?
+  detail    String   @default("")
+  waktu     DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([waktu])
+  @@index([entitas])
+  @@index([userId])
+}

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.log
+.env
+.env.*
+server/dev.db
+server/dev.db-journal
+server/prisma/dev.db
+server/prisma/*.db
+server/prisma/*.db-journal
+server/prisma/migrations/**/migration_lock.toml.bak
+.DS_Store

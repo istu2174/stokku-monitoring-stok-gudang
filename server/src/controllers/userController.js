@@ -3,6 +3,7 @@ import { prisma } from '../lib/prisma.js';
 import { catatAudit } from '../lib/audit.js';
 import { LABEL_ROLE, ROLE, SEMUA_ROLE } from '../lib/roles.js';
 import { badRequest, conflict, notFound } from '../lib/errors.js';
+import { jagaAkunDemo } from '../lib/demo.js';
 import {
   pageLimit,
   salahSatuDari,
@@ -97,6 +98,7 @@ export async function ubahUser(req, res, next) {
   try {
     const target = await prisma.user.findUnique({ where: { id: req.params.id } });
     if (!target) throw notFound('User tidak ditemukan.');
+    jagaAkunDemo(target.username);
 
     const data = {};
     if (req.body?.nama !== undefined) data.nama = teksWajib(req.body.nama, 'Nama', 100);
@@ -172,6 +174,7 @@ export async function resetPassword(req, res, next) {
 
     const target = await prisma.user.findUnique({ where: { id: req.params.id } });
     if (!target) throw notFound('User tidak ditemukan.');
+    jagaAkunDemo(target.username);
 
     await prisma.user.update({
       where: { id: target.id },

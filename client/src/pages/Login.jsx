@@ -146,6 +146,12 @@ export default function Login() {
               <span aria-hidden>{bukaDemo ? '▲' : '▼'}</span>
             </button>
             {bukaDemo && (
+              <p className="border-t border-slate-100 px-4 py-2.5 text-xs text-inkl">
+                Dipakai bareng pengunjung lain. Password akun demo dikunci, dan data balik ke awal
+                tiap server restart.
+              </p>
+            )}
+            {bukaDemo && (
               <ul className="divide-y divide-slate-100 border-t border-slate-100">
                 {AKUN_DEMO.map((akun) => (
                   <li key={akun.username}>

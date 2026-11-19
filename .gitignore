@@ -10,3 +10,4 @@ server/prisma/*.db
 server/prisma/*.db-journal
 server/prisma/migrations/**/migration_lock.toml.bak
 .DS_Store
+graphify-out/

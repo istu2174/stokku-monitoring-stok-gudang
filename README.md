@@ -5,6 +5,17 @@ stock opname, stok per batch dengan FEFO, peringatan stok menipis & expired, lap
 Excel/CSV, dan audit log. Ada 6 jabatan (role) dengan hak akses berbeda yang **ditegakkan di backend**,
 bukan cuma disembunyikan menunya.
 
+## 🌐 Coba online
+
+**https://stokku-kjxx.onrender.com** — login pakai salah satu [akun demo](#akun-demo) (ada panel klik-isi di halaman login).
+
+- Server gratis di Render: kalau 15 menit sepi, server tidur, jadi buka pertama bisa nunggu ±1 menit.
+- Gudangnya dipakai bareng semua pengunjung. Coba alurnya lintas role: login `staf` → ajukan barang keluar,
+  lalu login `kepala` → setujui di **Persetujuan**.
+- Akun demo dikunci (password, role, status nggak bisa diubah) supaya nggak ada yang mengunci pengunjung lain.
+  Mau coba fitur kelola user? Login `admin`, buat user baru, lalu edit user itu.
+- Data balik ke data contoh tiap server restart/tidur.
+
 ---
 
 ## 1. Tech stack
@@ -193,6 +204,10 @@ JWT_SECRET="ganti-dengan-string-panjang-acak"
 NODE_ENV=development
 ```
 
+Di produksi (`NODE_ENV=production`) **mode demo** otomatis aktif: 6 akun seed dikunci dari perubahan.
+Matikan dengan `DEMO_MODE=false` kalau dipakai sungguhan. Kalau `JWT_SECRET` kosong di produksi, server
+membuat secret acak per proses (bukan pakai secret bawaan repo).
+
 Kalau port 4000 dipakai aplikasi lain, ubah `PORT` **dan** proxy di `client/vite.config.js`.
 
 ### Build produksi
@@ -221,4 +236,4 @@ npm start         # server menyajikan API + file hasil build di http://localhost
 
 ## 9. Di luar scope (sesuai PRD)
 
-Multi-gudang/cabang, scan barcode/QR, integrasi kasir/akuntansi, notifikasi email/WhatsApp, aplikasi mobile native, dan deploy cloud.
+Multi-gudang/cabang, scan barcode/QR, integrasi kasir/akuntansi, notifikasi email/WhatsApp, dan aplikasi mobile native.

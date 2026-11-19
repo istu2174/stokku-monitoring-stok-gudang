@@ -6,6 +6,7 @@ import { catatAudit } from '../lib/audit.js';
 import { izinRole, LABEL_ROLE } from '../lib/roles.js';
 import { unauthorized, badRequest } from '../lib/errors.js';
 import { teksWajib } from '../utils/validasi.js';
+import { jagaAkunDemo } from '../lib/demo.js';
 
 /** Bentuk data user yang aman dikirim ke frontend. */
 function userAman(user) {
@@ -104,6 +105,7 @@ export async function me(req, res) {
 /** PUT /api/auth/password — ganti password sendiri. */
 export async function gantiPassword(req, res, next) {
   try {
+    jagaAkunDemo(req.user.username);
     const passwordLama = String(req.body?.passwordLama ?? '');
     const passwordBaru = String(req.body?.passwordBaru ?? '');
 
